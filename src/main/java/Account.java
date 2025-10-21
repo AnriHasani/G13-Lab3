@@ -64,8 +64,20 @@ public class Account implements IAccount {
 
     @Override
     public BigDecimal withdraw(BigDecimal requestedAmount) {
-        return this.balance.subtract(requestedAmount);
+        // Calculate the lowest allowed balance (-max_overdrawn)
+        BigDecimal allowedLimit = this.max_overdrawn.negate();
+        BigDecimal newBalance = this.balance.subtract(requestedAmount);
+
+        // Only update balance if it doesn't exceed allowed overdraft
+        if (newBalance.compareTo(allowedLimit) >= 0) {
+            this.balance = newBalance;  // Update balance
+            return this.balance;
+        } else {
+            // Withdrawal rejected, balance unchanged
+            return this.balance;
+        }
     }
+// Fix: Original code did not check max_overdrawn or update balance
 
     @Override
     public BigDecimal deposit(BigDecimal amount_to_deposit) {

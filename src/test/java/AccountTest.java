@@ -76,7 +76,29 @@ class AccountTest {
 
     @Test
     void testWithdraw() {
-        fail("Not yet imnplemented"); //TODO implement
+        /**
+         * Expected behavior: Withdrawals within balance + maxOverdrawn should succeed
+         *                     and update the balance correctly.
+         * Provided skeleton behavior: Original withdraw() did not update the balance
+         *                             and did not respect maxOverdrawn.
+         * Reason for input:
+         *     - Test withdrawing 120 from 100 with maxOverdrawn 50 (edge case within limit)
+         *     - Test withdrawing more than allowed (should fail and balance remains)
+         * Fix applied:
+         *     - Updated withdraw() to check maxOverdrawn limit
+         *     - Updated withdraw() to set this.balance only if allowed
+         */
+
+        // Case 1: Withdraw within allowed limit
+        Account myTestAccount = new Account(new BigDecimal("100"), "SEK", new BigDecimal("50"));
+        BigDecimal newBalance = myTestAccount.withdraw(new BigDecimal("120"));
+        assertEquals(new BigDecimal("-20"), newBalance);
+        assertEquals(new BigDecimal("-20"), myTestAccount.getBalance());
+
+        // Case 2: Withdraw exceeding allowed limit (should fail)
+        BigDecimal attempt = myTestAccount.withdraw(new BigDecimal("100"));
+        assertEquals(new BigDecimal("-20"), attempt); // Balance unchanged
+        assertEquals(new BigDecimal("-20"), myTestAccount.getBalance());
     }
 
     @Test

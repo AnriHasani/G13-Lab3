@@ -76,7 +76,7 @@ class AccountTest {
 
     @Test
     void testWithdraw() {
-        /**
+        /*
          * Expected behavior: Withdrawals within balance + maxOverdrawn should succeed
          *                     and update the balance correctly.
          * Provided skeleton behavior: Original withdraw() did not update the balance
@@ -99,11 +99,44 @@ class AccountTest {
         BigDecimal attempt = myTestAccount.withdraw(new BigDecimal("100"));
         assertEquals(new BigDecimal("-20"), attempt); // Balance unchanged
         assertEquals(new BigDecimal("-20"), myTestAccount.getBalance());
+
+        // Case 3: Withdraw exact maximum allowed
+        Account edgeAccount = new Account(new BigDecimal("100"), "SEK", new BigDecimal("50"));
+        BigDecimal exactMax = edgeAccount.withdraw(new BigDecimal("150"));
+        assertEquals(new BigDecimal("-50"), exactMax);
+        assertEquals(new BigDecimal("-50"), edgeAccount.getBalance());
     }
 
     @Test
     void testDeposit() {
-        fail("Not yet implemented"); //TODO implement
+        /*
+         * Expected behavior: Deposit adds the amount to the account balance.
+         *                     Negative deposits are ignored.
+         * Provided skeleton behavior: Original deposit() did not update balance.
+         * Reason for input:
+         *     - Deposit 50 into 100 balance -> expect 150
+         *     - Deposit 0 -> expect no change
+         *     - Deposit negative (-10) -> expect no change
+         * Fix applied:
+         *     - Updated deposit() to modify balance and prevent negative deposits
+         */
+
+        Account myTestAccount = new Account(new BigDecimal("100"), "SEK", new BigDecimal("50"));
+
+        // Case 1: Normal deposit
+        BigDecimal newBalance = myTestAccount.deposit(new BigDecimal("50"));
+        assertEquals(new BigDecimal("150"), newBalance);
+        assertEquals(new BigDecimal("150"), myTestAccount.getBalance());
+
+        // Case 2: Deposit zero
+        newBalance = myTestAccount.deposit(BigDecimal.ZERO);
+        assertEquals(new BigDecimal("150"), newBalance);
+        assertEquals(new BigDecimal("150"), myTestAccount.getBalance());
+
+        // Case 3: Deposit negative -> balance should not change
+        newBalance = myTestAccount.deposit(new BigDecimal("-10"));
+        assertEquals(new BigDecimal("150"), newBalance);
+        assertEquals(new BigDecimal("150"), myTestAccount.getBalance());
     }
 
     @Test

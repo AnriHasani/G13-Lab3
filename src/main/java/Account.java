@@ -81,8 +81,18 @@ public class Account implements IAccount {
 
     @Override
     public BigDecimal deposit(BigDecimal amount_to_deposit) {
-        return this.balance.add(amount_to_deposit);
+        // Prevent negative deposits
+        if (amount_to_deposit.compareTo(BigDecimal.ZERO) < 0) {
+            return this.balance; // ignore negative deposits
+        }
+        this.balance = this.balance.add(amount_to_deposit); // update balance
+        return this.balance;
     }
+//Problems:
+//
+//It doesn’t update the account balance, only returns a sum.
+//
+//It doesn’t prevent negative deposits.
 
     @Override
     public void convertToCurrency(String currencyCode, double rate) {

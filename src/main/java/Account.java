@@ -21,7 +21,7 @@ public class Account implements IAccount {
     }
 
     public void setMaxOverdrawn(BigDecimal max_overdrawn) {
-        if(max_overdrawn.compareTo(BigDecimal.ZERO) <= 0) {
+        if (max_overdrawn.compareTo(BigDecimal.ZERO) <= 0) {
             this.max_overdrawn = BigDecimal.ZERO;
         } else {
             this.max_overdrawn = max_overdrawn;
@@ -37,7 +37,7 @@ public class Account implements IAccount {
     }
 
     public void setBalance(BigDecimal balance) {
-        if(!(balance.compareTo(this.max_overdrawn.multiply(new BigDecimal(-1))) <= 0)) {
+        if (!(balance.compareTo(this.max_overdrawn.multiply(new BigDecimal(-1))) <= 0)) {
             this.balance = balance;
         }
     }
@@ -55,7 +55,7 @@ public class Account implements IAccount {
     public Account(BigDecimal starting_balance, String currency, BigDecimal max_overdrawn) {
         this.balance = starting_balance;
         this.currency = currency;
-        if(max_overdrawn.compareTo(BigDecimal.ZERO) <= 0) {
+        if (max_overdrawn.compareTo(BigDecimal.ZERO) <= 0) {
             this.max_overdrawn = BigDecimal.ZERO;
         } else {
             this.max_overdrawn = max_overdrawn;
@@ -102,14 +102,57 @@ public class Account implements IAccount {
 
     @Override
     public void TransferToAccount(IAccount to_account) {
-        to_account.deposit(this.balance);
+
+        // I make out of the interface the object to be able to get the currency
+        if (to_account instanceof Account) {
+            Account targetAccount = (Account) to_account;
+
+            // Only transfer if my balance is positive
+            if (this.balance.compareTo(BigDecimal.ZERO) <= 0) {
+                System.out.println("Transfer failed: Negative or Zero balance");
+                return;
+            }
+
+            // Only transfer if currencies match
+            if (this.currency.equals(targetAccount.getCurrency())) {
+                // Transfer full balance
+                targetAccount.deposit(this.balance);
+                // Set sender's balance to zero
+                this.balance = BigDecimal.ZERO;
+
+            } else  {
+                System.out.println("Transfer failed: currencies do not match.");
+                return;
+            }
+        }
     }
+
+    /*
+    Initially the method did not update the sender's balance, leading to errors, eve though the reciever was being updated
+     */
+
+
 
     @Override
     public BigDecimal withdrawAll() {
-        if(this.balance.compareTo(this.max_overdrawn) <= 0) { // This can be read as "if (balance <= max_overdrawn)"
-            return withdraw(balance);
+
+        // I can only withdraw if I have positive balance
+        if (this.balance.compareTo(BigDecimal.ZERO) < 0) {
+            return this.balance;
         }
+
+        // If I can not be in debt in my account ill never be able to withdraw all
+        if (this.max_overdrawn.compareTo(BigDecimal.ZERO) == 0) {
+            System.out.println("Transfer failed: No withdraw");
+            return this.balance;
+        }
+
+        this.balance = BigDecimal.ZERO;
         return BigDecimal.ZERO;
     }
 }
+
+/*
+ The method did not xxx with drawing without a positive balance, stating that fo us is imposible to get in debt
+ */
+

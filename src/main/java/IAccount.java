@@ -32,6 +32,5 @@ public interface IAccount {
      * Method that makes transfer from one account to another.
      * The transfer should be possible if and only if both accounts hold the same currency.
      * */
-
     public abstract void TransferToAccount(IAccount account);
 }

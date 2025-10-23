@@ -146,11 +146,71 @@ class AccountTest {
 
     @Test
     void testTransferToAccount() {
-        fail("Not yet implemented"); //TODO implement
+
+        // Main scenario
+        Account myTestAccount1 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+        Account myTestAccount2 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+
+        assertEquals(myTestAccount1.getCurrency(), myTestAccount2.getCurrency());
+
+        BigDecimal previous_amount1 =  myTestAccount1.getBalance();
+        BigDecimal previous_amount2 =  myTestAccount2.getBalance();
+
+        myTestAccount1.TransferToAccount(myTestAccount2);
+
+        assertEquals(new BigDecimal(0), myTestAccount1.getBalance());
+        assertEquals(previous_amount1.add(previous_amount2), myTestAccount2.getBalance());
+
+
+        // Currencies without matching
+        Account myTestAccount3 = new Account(new BigDecimal("100"), "SEK", new BigDecimal("100"));
+        Account myTestAccount4 = new Account(new BigDecimal("100"), "USD", new BigDecimal("100"));
+
+        BigDecimal previous_amount3 =  myTestAccount3.getBalance();
+        BigDecimal previous_amount4 =  myTestAccount4.getBalance();
+
+        myTestAccount3.TransferToAccount(myTestAccount4);
+
+        assertEquals(previous_amount3, myTestAccount3.getBalance());
+        assertEquals(previous_amount4, myTestAccount4.getBalance());
+
+        // Transfering without positive balance
+        Account myTestAccount5 = new Account(new BigDecimal("-200"), "SEK", new BigDecimal("100"));
+        Account myTestAccount6 = new Account(new BigDecimal("200"), "SEK", new BigDecimal("100"));
+
+        BigDecimal previous_amount5 =  myTestAccount5.getBalance();
+        BigDecimal previous_amount6 =  myTestAccount6.getBalance();
+
+        myTestAccount5.TransferToAccount(myTestAccount6);
+
+        assertEquals(previous_amount5, myTestAccount5.getBalance());
+        assertEquals(previous_amount6, myTestAccount6.getBalance());
     }
 
     @Test
     void testWithdrawAll() {
-        fail("Not yet implemented"); //TODO implement
+
+        // Main scenario
+        Account myTestAccount1 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+
+        myTestAccount1.withdrawAll();
+
+        assertEquals(new BigDecimal("0"), myTestAccount1.getBalance());
+
+
+        // Negative balance
+        Account myTestAccount2 = new Account(new BigDecimal("-10"), "SEK", new BigDecimal("100"));
+
+        myTestAccount2.withdrawAll();
+
+        assertEquals(new BigDecimal("-10"), myTestAccount2.getBalance());
+
+        // 0 withdraw
+        Account myTestAccount3 = new Account(new BigDecimal("150"), "SEK", new BigDecimal("0"));
+
+        myTestAccount3.withdrawAll();
+
+        assertEquals(new BigDecimal("150"), myTestAccount3.getBalance());
+
     }
 }

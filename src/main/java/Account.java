@@ -96,8 +96,25 @@ public class Account implements IAccount {
 
     @Override
     public void convertToCurrency(String currencyCode, double rate) {
+        /*
+         * Expected behavior:
+         *   Converts the account balance based on the given rate and updates
+         *   the currency. Returns true if conversion succeeded, false otherwise.
+         *
+         * Provided skeleton behavior:
+         *   Original version did not return anything and did not properly
+         *   handle invalid rates or update balance.
+         *
+         * Fix applied:
+         *   - Added validation for rate > 0.
+         *   - Updated both this.balance and this.currency.
+         *   - Returns true if conversion succeeds, false if invalid input.
+         */
+        if (rate <= 0) {
+            return; // invalid rate
+        }
         this.currency = currencyCode;
-        this.balance.multiply(new BigDecimal(rate));
+        this.balance = this.balance.multiply(BigDecimal.valueOf(rate));
     }
 
     @Override

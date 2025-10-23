@@ -141,9 +141,43 @@ class AccountTest {
 
     @Test
     void testConvertToCurrency() {
-        fail("Not yet implemented"); //TODO implement
-    }
+        /*
+         * Expected behavior:
+         *   - convertToCurrency() updates balance and currency correctly.
+         *   - No return value (void method).
+         *
+         * Provided skeleton behavior:
+         *   - Originally did not update balance or currency.
+         *
+         * Reason for input:
+         *   - Case 1: Conversion to same currency (rate = 1)
+         *   - Case 2: Conversion from USD to EUR (rate = 0.92)
+         *   - Case 3: Invalid rate (0.0) — should not change balance or currency
+         *
+         * Fix applied:
+         *   - Added logic to update both balance and currency.
+         *   - Handled invalid rate  (no update performed).
+         */
 
+        // Case 1: Normal conversion, same currency
+        Account acc1 = new Account(new BigDecimal("100"), "SEK", new BigDecimal("50"));
+        acc1.convertToCurrency("SEK", 1);
+        assertEquals("SEK", acc1.getCurrency());
+        assertEquals(0, acc1.getBalance().compareTo(new BigDecimal("100")));
+
+        // Case 2: Convert USD → EUR,  rate 0.92
+        Account acc2 = new Account(new BigDecimal("100"), "USD", new BigDecimal("100"));
+        acc2.convertToCurrency("EUR", 0.92);
+        assertEquals("EUR", acc2.getCurrency());
+        assertEquals(0, acc2.getBalance().compareTo(new BigDecimal("92.00")));
+
+        // Case 3: Invalid rate (0.0) — should not change values
+        Account acc3 = new Account(new BigDecimal("100"), "USD", new BigDecimal("100"));
+        acc3.convertToCurrency("EUR", 0.0); // invalid
+        assertEquals("USD", acc3.getCurrency());
+        assertEquals(0, acc3.getBalance().compareTo(new BigDecimal("100")));
+    }
+    
     @Test
     void testTransferToAccount() {
         fail("Not yet implemented"); //TODO implement

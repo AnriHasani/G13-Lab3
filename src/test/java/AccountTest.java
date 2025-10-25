@@ -33,13 +33,13 @@ class AccountTest {
 
     @Test
     void testGetCurrency() {
-        Account myTestAccount = new Account(BigDecimal.ZERO,  "SEK", BigDecimal.ZERO);
+        Account myTestAccount = new Account(BigDecimal.ZERO, "SEK", BigDecimal.ZERO);
         assertEquals("SEK", myTestAccount.getCurrency());
 
-        myTestAccount = new Account(BigDecimal.ZERO,  "EUR", BigDecimal.ZERO);
+        myTestAccount = new Account(BigDecimal.ZERO, "EUR", BigDecimal.ZERO);
         assertEquals("EUR", myTestAccount.getCurrency());
 
-        myTestAccount = new Account(BigDecimal.ZERO,  "USD", BigDecimal.ZERO);
+        myTestAccount = new Account(BigDecimal.ZERO, "USD", BigDecimal.ZERO);
         assertEquals("USD", myTestAccount.getCurrency());
     }
 
@@ -177,14 +177,108 @@ class AccountTest {
         assertEquals("USD", acc3.getCurrency());
         assertEquals(0, acc3.getBalance().compareTo(new BigDecimal("100")));
     }
-    
+
     @Test
     void testTransferToAccount() {
-        fail("Not yet implemented"); //TODO implement
+
+        /*
+         * Test Case 1: Normal transfer between two accounts with the same currency
+         * Expected behavior: Entire balance from account1 should be transferred to account2.
+         * Skeleton issue: The original TransferToAccount did not set the sender’s balance to zero after transferring.
+         * Fix applied: Added `this.balance = BigDecimal.ZERO` in TransferToAccount().
+         */
+        Account myTestAccount1 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+        Account myTestAccount2 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+
+        BigDecimal prev1 = myTestAccount1.getBalance();
+        BigDecimal prev2 = myTestAccount2.getBalance();
+
+        myTestAccount1.TransferToAccount(myTestAccount2);
+
+        assertEquals(new BigDecimal("0"), myTestAccount1.getBalance()); // sender emptied
+        assertEquals(prev1.add(prev2), myTestAccount2.getBalance()); // receiver increased correctly
+
+
+        /*
+         * Test Case 2: Mismatched currency transfer
+         * Expected behavior: Transfer should not occur if currencies differ.
+         * Skeleton issue: Original implementation ignored currency check.
+         * Fix applied: Added currency equality condition in TransferToAccount().
+         */
+        Account myTestAccount3 = new Account(new BigDecimal("100"), "SEK", new BigDecimal("100"));
+        Account myTestAccount4 = new Account(new BigDecimal("100"), "USD", new BigDecimal("100"));
+
+        BigDecimal prev3 = myTestAccount3.getBalance();
+        BigDecimal prev4 = myTestAccount4.getBalance();
+
+        myTestAccount3.TransferToAccount(myTestAccount4);
+
+        assertEquals(prev3, myTestAccount3.getBalance());
+        assertEquals(prev4, myTestAccount4.getBalance());
+
+
+        /*
+         * Test Case 3: Transfer from account with negative or zero balance
+         * Expected behavior: Transfer should fail — no money moved.
+         * Skeleton issue: Original code transferred funds even with non-positive balance.
+         * Fix applied: Added check `if (this.balance.compareTo(BigDecimal.ZERO) <= 0) return;`
+         */
+        Account myTestAccount5 = new Account(new BigDecimal("-200"), "SEK", new BigDecimal("100"));
+        Account myTestAccount6 = new Account(new BigDecimal("200"), "SEK", new BigDecimal("100"));
+
+        BigDecimal prev5 = myTestAccount5.getBalance();
+        BigDecimal prev6 = myTestAccount6.getBalance();
+
+        myTestAccount5.TransferToAccount(myTestAccount6);
+
+        assertEquals(prev5, myTestAccount5.getBalance());
+        assertEquals(prev6, myTestAccount6.getBalance());
     }
+
 
     @Test
     void testWithdrawAll() {
-        fail("Not yet implemented"); //TODO implement
+
+        /*
+         * ✅ Test Case 1: Account with positive balance
+         * Expected behavior:
+         *   - Withdraws all funds (balance → 0).
+         *   - Returns the withdrawn amount.
+         * Skeleton issue:
+         *   - Did not return the correct withdrawn amount.
+         * Fix applied:
+         *   - Added variable to store and return withdrawn amount.
+         */
+        Account acc1 = new Account(new BigDecimal("10"), "SEK", new BigDecimal("100"));
+        BigDecimal withdrawn1 = acc1.withdrawAll();
+        assertEquals(new BigDecimal("0"), acc1.getBalance());
+        assertEquals(new BigDecimal("10"), withdrawn1);
+
+
+        /*
+         * ✅ Test Case 2: Account with negative balance
+         * Expected behavior:
+         *   - No withdrawal should occur.
+         * Skeleton issue:
+         *   - Negative balances were incorrectly reset to zero.
+         * Fix applied:
+         *   - Added check to only withdraw when balance > 0.
+         */
+        Account acc2 = new Account(new BigDecimal("-10"), "SEK", new BigDecimal("100"));
+        BigDecimal withdrawn2 = acc2.withdrawAll();
+        assertEquals(new BigDecimal("-10"), acc2.getBalance());
+        assertEquals(new BigDecimal("0"), withdrawn2);
+
+
+        /*
+         * ✅ Test Case 3: Account with zero balance
+         * Expected behavior:
+         *   - No withdrawal occurs, returns zero.
+         *   - Balance remains zero.
+         */
+        Account acc3 = new Account(new BigDecimal("0"), "SEK", new BigDecimal("100"));
+        BigDecimal withdrawn3 = acc3.withdrawAll();
+        assertEquals(new BigDecimal("0"), acc3.getBalance());
+        assertEquals(new BigDecimal("0"), withdrawn3);
     }
 }
